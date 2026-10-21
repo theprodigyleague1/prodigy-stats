@@ -6,9 +6,10 @@ of every player. Stats come from the Superstat API, refreshed once a day.
 
 ## How it works
 
-- `scripts/build-data.mjs` — runs on every Vercel build. Reads each club's teams, finds the
-  Fall 2026 teams, sums every completed match's box score into season lines per player, and
-  saves `data/leaderboard.json`. Visitors load that file and never hit the Superstat API.
+- `scripts/build-data.mjs` — runs on every Vercel build. Copies the page into `public/`
+  (the deployed folder), then reads each club's teams, finds the Fall 2026 teams, sums every
+  completed match's box score into season lines per player, and saves
+  `public/data/leaderboard.json`. New page files must be added to its `STATIC` list. Visitors load that file and never hit the Superstat API.
   If any team fails to load, the build fails and Vercel keeps the previous deployment live.
 - `api/refresh.js` + `vercel.json` — a Vercel cron at 10:00 UTC each day calls the deploy
   hook, which rebuilds the site with fresh stats.
