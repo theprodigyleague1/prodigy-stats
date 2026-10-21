@@ -16,7 +16,11 @@ export default async function handler(req, res) {
         .filter(Boolean),
     )];
     const data = await buildLeaderboard({ apiKeys, debug });
-    res.setHeader('Cache-Control', debug ? 'no-store' : 's-maxage=600, stale-while-revalidate=86400');
+    // A run where some team failed is only kept for a minute, so it heals quickly.
+    const cache = debug ? 'no-store'
+      : data.warnings?.length ? 's-maxage=60, stale-while-revalidate=600'
+      : 's-maxage=600, stale-while-revalidate=86400';
+    res.setHeader('Cache-Control', cache);
     res.status(200).json(data);
   } catch (err) {
     console.error(err);
