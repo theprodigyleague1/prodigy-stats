@@ -1,0 +1,9 @@
+{
+  "name": "prodigy-league-leaderboard",
+  "private": true,
+  "type": "module",
+  "description": "Prodigy League stat leaders by division, powered by the Superstat API.",
+  "engines": {
+    "node": ">=20"
+  }
+}

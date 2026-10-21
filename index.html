@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prodigy League Leaderboard</title>
+  <meta name="description" content="Prodigy League individual stat leaders for the NXT, Frosh and Prep divisions.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="demo-banner" class="demo-banner" hidden>Demo data — made-up stats for previewing the design. Remove <code>?demo</code> from the URL for live stats.</div>
+
+  <header class="hero">
+    <div class="wrap">
+      <p class="eyebrow"><span id="league">Prodigy League</span> · <span id="season">Fall 2026</span></p>
+      <h1><span id="division-name">Leaderboard</span> <span class="thin">Leaders</span></h1>
+
+      <div class="controls" role="group" aria-label="Leaderboard options">
+        <label class="field">
+          <span>Division</span>
+          <select id="division" aria-label="Division"></select>
+        </label>
+        <label class="field">
+          <span>Team</span>
+          <select id="team" aria-label="Team"><option value="all">All teams</option></select>
+        </label>
+        <div class="field">
+          <span>View</span>
+          <div class="toggle" role="group" aria-label="Per game or totals">
+            <button type="button" data-mode="pg" aria-pressed="true">Per game</button>
+            <button type="button" data-mode="tot" aria-pressed="false">Totals</button>
+          </div>
+        </div>
+      </div>
+      <p class="status-row">
+        <span id="status" class="status" aria-live="polite"></span>
+        <a class="credit" href="https://superstatsport.com" target="_blank" rel="noopener">Powered by Superstat</a>
+      </p>
+    </div>
+  </header>
+
+  <main class="wrap" id="board" aria-busy="true">
+    <section aria-labelledby="leaders-title">
+      <div class="section-head">
+        <h2 id="leaders-title">Category leaders</h2>
+        <p id="qual-note" class="note"></p>
+      </div>
+      <div id="leaders" class="grid"></div>
+    </section>
+
+    <section aria-labelledby="table-title" class="table-section">
+      <div class="section-head">
+        <h2 id="table-title">All players</h2>
+        <input id="search" type="search" placeholder="Search player or team" aria-label="Search players">
+      </div>
+      <div class="table-scroll">
+        <table id="players">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <a href="https://superstatsport.com" target="_blank" rel="noopener">Powered by Superstat</a>
+    <span id="updated"></span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
