@@ -1,13 +1,24 @@
-// Runs during the Vercel build: pulls every box score once and saves the result as
-// data/leaderboard.json, which the page loads as a plain static file. Visitors never
-// touch the Superstat API; the data refreshes whenever the site is rebuilt (daily cron).
+// Runs during the Vercel build. Copies the page into public/ (Vercel's output folder)
+// and pulls every box score once, saving public/data/leaderboard.json, which the page
+// loads as a plain static file. Visitors never touch the Superstat API; the data
+// refreshes whenever the site is rebuilt (daily cron).
 //
 // If any team fails to load, the build fails on purpose so Vercel keeps serving the
 // previous good deployment instead of publishing partial stats.
 
-import { writeFile, mkdir } from 'node:fs/promises';
+import { cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { buildLeaderboard } from '../lib/leaderboard.js';
 import { apiKeysFromEnv } from '../lib/keys.js';
+
+const root = new URL('../', import.meta.url);
+const out = new URL('public/', root);
+const STATIC = ['index.html', 'app.js', 'styles.css', 'data/demo.js', 'lib/leaderboard.js', 'lib/divisions.js'];
+
+await rm(out, { recursive: true, force: true });
+for (const file of STATIC) {
+  await mkdir(new URL(file.replace(/[^/]+$/, ''), out), { recursive: true });
+  await cp(new URL(file, root), new URL(file, out));
+}
 
 const apiKeys = apiKeysFromEnv();
 if (!apiKeys.length) {
@@ -23,12 +34,12 @@ if (failed.length) {
   process.exit(1);
 }
 
-await mkdir(new URL('../data/', import.meta.url), { recursive: true });
-await writeFile(new URL('../data/leaderboard.json', import.meta.url), JSON.stringify(data));
+await mkdir(new URL('data/', out), { recursive: true });
+await writeFile(new URL('data/leaderboard.json', out), JSON.stringify(data));
 
 for (const d of data.divisions) {
   const reporting = d.teams.filter(t => t.status === 'ok').length;
   console.log(`${d.name}: ${d.players.length} players, ${reporting}/${d.teams.length} teams`);
 }
 if (data.warnings.length) console.warn('Warnings:\n  ' + data.warnings.join('\n  '));
-console.log(`Saved data/leaderboard.json in ${((Date.now() - started) / 1000).toFixed(1)}s`);
+console.log(`Saved public/data/leaderboard.json in ${((Date.now() - started) / 1000).toFixed(1)}s`);
