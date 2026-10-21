@@ -2,13 +2,18 @@
 
 Individual stat leaders (PPG, RPG, APG, SPG, BPG, 3PM, FG%, 3P%, FT%, and more) for the
 NXT, Frosh and Prep divisions, with per-game and season-total views and a sortable table
-of every player. Stats come live from the Superstat API.
+of every player. Stats come from the Superstat API, refreshed once a day.
 
 ## How it works
 
-- `api/leaderboard.js` — Vercel serverless function. Uses your Superstat API key to list the
-  club's teams, find the Fall 2026 teams, read every completed match's box score, and sum
-  them into season lines per player. Vercel caches the result for 10 minutes.
+- `scripts/build-data.mjs` — runs on every Vercel build. Reads each club's teams, finds the
+  Fall 2026 teams, sums every completed match's box score into season lines per player, and
+  saves `data/leaderboard.json`. Visitors load that file and never hit the Superstat API.
+  If any team fails to load, the build fails and Vercel keeps the previous deployment live.
+- `api/refresh.js` + `vercel.json` — a Vercel cron at 10:00 UTC each day calls the deploy
+  hook, which rebuilds the site with fresh stats.
+- `api/leaderboard.js` — fallback that builds the same data on request (cached for a day).
+  Also serves `?debug=1`.
 - `lib/divisions.js` — which Superstat teams belong to which division. Edit this to add or
   rename teams.
 - `index.html`, `app.js`, `styles.css` — the page. Division dropdown, team filter,
@@ -23,8 +28,12 @@ Percentage leaders also need attempts: FG% 2 FGA per game, 3P% and FT% 1 attempt
    Switch to each club in Superstat, open **Settings → API keys**, and create a key there.
 2. Push this folder to a GitHub repo and import it at vercel.com/new (no build settings needed),
    or run `npx vercel` from this folder.
-3. In the Vercel project, go to **Settings → Environment Variables**, add
-   `SUPERSTAT_API_KEYS` with all three keys separated by commas, then redeploy.
+3. In the Vercel project, go to **Settings → Environment Variables** and add the keys, either
+   as `SUPERSTAT_API_KEYS` (comma-separated) or as `NXT_KEY`, `FROSH_KEY` and `PREP_KEY`.
+4. For the daily refresh, go to **Settings → Git → Deploy Hooks**, create a hook for `main`,
+   and save its URL as the `DEPLOY_HOOK_URL` environment variable. Optionally set
+   `CRON_SECRET` to any random string so only Vercel's cron can trigger a rebuild.
+5. Redeploy. To refresh stats right away at any time, redeploy from the Vercel dashboard.
 
 Keep the key out of the code and out of git. It only lives in Vercel.
 

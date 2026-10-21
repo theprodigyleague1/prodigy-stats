@@ -2,5 +2,6 @@
 .env.local
 .vercel
 .claude
+data/leaderboard.json
 node_modules
 .DS_Store

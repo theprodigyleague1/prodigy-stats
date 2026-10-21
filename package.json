@@ -3,6 +3,9 @@
   "private": true,
   "type": "module",
   "description": "Prodigy League stat leaders by division, powered by the Superstat API.",
+  "scripts": {
+    "build": "node scripts/build-data.mjs"
+  },
   "engines": {
     "node": ">=20"
   }

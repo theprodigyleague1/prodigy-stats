@@ -28,6 +28,9 @@ async function loadLive() {
     const apiKeys = Array.from({ length: dev.keys ?? 1 }, (_, i) => `dev:${i}`);
     return buildLeaderboard({ apiKeys, fetchImpl });
   }
+  // Normal path: stats saved at deploy time (refreshed daily), no Superstat call.
+  const saved = await fetch('/data/leaderboard.json').catch(() => null);
+  if (saved?.ok) return saved.json();
   const res = await fetch('/api/leaderboard');
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body.error || `HTTP ${res.status}`);
